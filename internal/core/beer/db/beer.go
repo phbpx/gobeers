@@ -32,9 +32,9 @@ func (s Store) AddBeer(ctx context.Context, beer Beer) error {
 // QueryBeerByID retrieves a beer by its id.
 func (s Store) QueryBeerByID(ctx context.Context, id string) (Beer, error) {
 	params := struct {
-		Id string `db:"id"`
+		ID string `db:"id"`
 	}{
-		Id: id,
+		ID: id,
 	}
 
 	const q = `

@@ -1,3 +1,4 @@
+// Package db contains beer/review related CRUD functionality.
 package db
 
 import (

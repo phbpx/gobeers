@@ -7,7 +7,7 @@ import (
 	"github.com/phbpx/gobeers/internal/sys/database"
 )
 
-// AddBeer adds a new beer review to the database.
+// AddReview adds a new beer review to the database.
 func (s Store) AddReview(ctx context.Context, review Review) error {
 	const q = `
         INSERT INTO reviews (
