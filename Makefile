@@ -59,3 +59,12 @@ docker-clean:
 
 docker-kind-logs:
 	docker logs -f $(KIND_CLUSTER)-control-plane
+
+# ==============================================================================
+# Dev support
+
+dev:
+	docker-compose -f zarf/dev/docker-compose.yaml up -d --build
+
+dev-stop:
+	docker-compose -f zarf/dev/docker-compose.yaml down

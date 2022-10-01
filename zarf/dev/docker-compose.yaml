@@ -1,0 +1,61 @@
+version: '3'
+
+services:
+
+  db:
+    image: postgres:14-alpine
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: testdb
+    ports:
+      - 5432:5432
+    networks:
+      - gobeers-net
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+    networks:
+      - gobeers-net
+
+  gobbers-api:
+    build:
+      context: ../../
+      dockerfile: ./zarf/docker/Dockerfile.api
+      args:
+        BUILD_REF: dev
+    environment:
+      GOBEERS_DB_HOST: "db:5432"
+      GOBEERS_ZIPKIN_REPORTER_URI: "http://zipkin:9411/api/v2/spans"
+    ports:
+      - 3000:3000
+    depends_on:
+      - db
+      - zipkin
+    networks:
+      - gobeers-net
+
+  zipkin:
+    image: ghcr.io/openzipkin/zipkin-slim:${TAG:-latest}
+    container_name: zipkin
+    environment:
+      - STORAGE_TYPE=mem
+      # Point the zipkin at the storage backend
+      - MYSQL_HOST=mysql
+      # Uncomment to enable self-tracing
+      # - SELF_TRACING_ENABLED=true
+      # Uncomment to increase heap size
+      # - JAVA_OPTS=-Xms128m -Xmx128m -XX:+ExitOnOutOfMemoryError
+    ports:
+      - 9411:9411
+    networks:
+      - gobeers-net
+
+networks:
+  gobeers-net:

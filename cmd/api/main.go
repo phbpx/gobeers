@@ -14,6 +14,7 @@ import (
 
 	"github.com/ardanlabs/conf/v3"
 	"github.com/phbpx/gobeers/cmd/api/handlers"
+	"github.com/phbpx/gobeers/internal/data/dbschema"
 	"github.com/phbpx/gobeers/internal/sys/database"
 	"github.com/phbpx/gobeers/kit/logger"
 	"go.opentelemetry.io/otel"
@@ -90,8 +91,8 @@ func run(log *zap.SugaredLogger) error {
 		}
 		Zipkin struct {
 			ReporterURI string  `conf:"default:http://localhost:9411/api/v2/spans"`
-			ServiceName string  `conf:"default:sales-api"`
-			Probability float64 `conf:"default:0.05"`
+			ServiceName string  `conf:"default:gobeers-api"`
+			Probability float64 `conf:"default:1.0"`
 		}
 	}{
 		Version: conf.Version{
@@ -141,6 +142,9 @@ func run(log *zap.SugaredLogger) error {
 	})
 	if err != nil {
 		return fmt.Errorf("connecting to db: %w", err)
+	}
+	if err := dbschema.Migrate(context.Background(), db); err != nil {
+		return fmt.Errorf("migrating db: %w", err)
 	}
 	defer func() {
 		log.Infow("shutdown", "status", "stopping database support", "host", cfg.DB.Host)
