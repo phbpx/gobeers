@@ -35,9 +35,9 @@ func NewCore(log *zap.SugaredLogger, sqlxDB *sqlx.DB) Core {
 // =========================================================================
 // Beer Support
 
-// AddBeer adds an beer to the database. Its return the created Beer
+// Create adds an beer to the database. Its return the created Beer
 // with fields populated.
-func (c Core) AddBeer(ctx context.Context, nb NewBeer, now time.Time) (Beer, error) {
+func (c Core) Create(ctx context.Context, nb NewBeer, now time.Time) (Beer, error) {
 	if err := validate.Check(nb); err != nil {
 		return Beer{}, fmt.Errorf("validating data: %w", err)
 	}
@@ -59,8 +59,8 @@ func (c Core) AddBeer(ctx context.Context, nb NewBeer, now time.Time) (Beer, err
 	return toBeer(dbBeer), nil
 }
 
-// QueryBeerByID gets the specified beer from the database.
-func (c Core) QueryBeerByID(ctx context.Context, id string) (Beer, error) {
+// QueryByID gets the specified beer from the database.
+func (c Core) QueryByID(ctx context.Context, id string) (Beer, error) {
 	if err := validate.CheckID(id); err != nil {
 		return Beer{}, ErrInvalidID
 	}
@@ -76,8 +76,8 @@ func (c Core) QueryBeerByID(ctx context.Context, id string) (Beer, error) {
 	return toBeer(dbBeer), nil
 }
 
-// QueryBeers gets all beers from the database.
-func (c Core) QueryBeers(ctx context.Context, page, pageSize int) ([]Beer, error) {
+// Query gets all beers from the database.
+func (c Core) Query(ctx context.Context, page, pageSize int) ([]Beer, error) {
 	dbBeers, err := c.store.QueryBeers(ctx, page, pageSize)
 	if err != nil {
 		return nil, fmt.Errorf("queryBeers: %w", err)
@@ -89,9 +89,9 @@ func (c Core) QueryBeers(ctx context.Context, page, pageSize int) ([]Beer, error
 // =========================================================================
 // Beer Review Support
 
-// AddReview adds a review to the database. Its return the created Review
+// CreateReview adds a review to the database. Its return the created Review
 // with fields populated.
-func (c Core) AddReview(ctx context.Context, beerID string, nr NewReview, now time.Time) (Review, error) {
+func (c Core) CreateReview(ctx context.Context, beerID string, nr NewReview, now time.Time) (Review, error) {
 	if err := validate.CheckID(beerID); err != nil {
 		return Review{}, ErrInvalidID
 	}
@@ -124,8 +124,8 @@ func (c Core) AddReview(ctx context.Context, beerID string, nr NewReview, now ti
 	return toReview(dbReview), nil
 }
 
-// QueryBeerReviews gets all reviews for a beer from the database.
-func (c Core) QueryBeerReviews(ctx context.Context, beerID string, page, pageSize int) ([]Review, error) {
+// QueryReviews gets all reviews for a beer from the database.
+func (c Core) QueryReviews(ctx context.Context, beerID string, page, pageSize int) ([]Review, error) {
 	if err := validate.CheckID(beerID); err != nil {
 		return nil, ErrInvalidID
 	}

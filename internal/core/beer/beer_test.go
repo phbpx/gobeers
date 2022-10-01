@@ -48,13 +48,13 @@ func TestBeer(t *testing.T) {
 				ShortDesc: "Test Short Description",
 			}
 
-			beer, err := core.AddBeer(ctx, nb, now)
+			beer, err := core.Create(ctx, nb, now)
 			if err != nil {
 				t.Fatalf("\t\t [ERROR] Should be able to add a beer : %s", err)
 			}
 			t.Logf("\t\t [SUCCESS] Should be able to add a beer.")
 
-			saved, err := core.QueryBeerByID(ctx, beer.ID)
+			saved, err := core.QueryByID(ctx, beer.ID)
 			if err != nil {
 				t.Fatalf("\t\t [ERROR] Should be able to query a beer by id : %s", err)
 			}
@@ -65,7 +65,7 @@ func TestBeer(t *testing.T) {
 			}
 			t.Logf("\t\t [SUCCESS] Should get back the same beer.")
 
-			beers, err := core.QueryBeers(ctx, 1, 10)
+			beers, err := core.Query(ctx, 1, 10)
 			if err != nil {
 				t.Fatalf("\t\t [ERROR] Should be able to query beers : %s", err)
 			}
@@ -93,7 +93,7 @@ func TestBeer(t *testing.T) {
 				ShortDesc: "Test Short Description",
 			}
 
-			b, err := core.AddBeer(ctx, nb, now)
+			b, err := core.Create(ctx, nb, now)
 			if err != nil {
 				t.Fatalf("\t\t [ERROR] Should be able to add a beer : %s", err)
 			}
@@ -104,13 +104,13 @@ func TestBeer(t *testing.T) {
 				Comment: "Test Comment",
 			}
 
-			_, err = core.AddReview(ctx, b.ID, nr, now)
+			_, err = core.CreateReview(ctx, b.ID, nr, now)
 			if err != nil {
 				t.Fatalf("\t\t [ERROR] Should be able to add a review : %s", err)
 			}
 			t.Logf("\t\t [SUCCESS] Should be able to add a review.")
 
-			reviews, err := core.QueryBeerReviews(ctx, b.ID, 1, 10)
+			reviews, err := core.QueryReviews(ctx, b.ID, 1, 10)
 			if err != nil {
 				t.Fatalf("\t\t [ERROR] Should be able to query reviews : %s", err)
 			}
