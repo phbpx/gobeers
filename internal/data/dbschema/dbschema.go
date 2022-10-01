@@ -25,7 +25,7 @@ func Migrate(ctx context.Context, db *sqlx.DB) error {
 	}
 
 	// Load the migrations from the embedded filesystem.
-	source, err := httpfs.New(http.FS(migrations), "migrations")
+	source, err := httpfs.New(http.FS(migrations), "sql")
 	if err != nil {
 		return fmt.Errorf("invalid source instance: %w", err)
 	}
