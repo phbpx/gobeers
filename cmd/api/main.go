@@ -20,6 +20,7 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/zipkin"
+	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
@@ -37,7 +38,7 @@ var build = "develop"
 func main() {
 
 	// Construct the application logger.
-	log, err := logger.New("SALES-API")
+	log, err := logger.New("gobeers-api")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -166,7 +167,7 @@ func run(log *zap.SugaredLogger) error {
 	}
 	defer traceProvider.Shutdown(context.Background())
 
-	tracer := traceProvider.Tracer("service")
+	tracer := traceProvider.Tracer("github.com/phbpx/gobeers/cmd/api")
 
 	// =========================================================================
 	// Start Debug Service
@@ -264,6 +265,7 @@ func startTracing(serviceName string, reporterURI string, probability float64) (
 		reporterURI,
 		// zipkin.WithLogger(zap.NewStdLog(log)),
 	)
+
 	if err != nil {
 		return nil, fmt.Errorf("creating new exporter: %w", err)
 	}
@@ -284,7 +286,7 @@ func startTracing(serviceName string, reporterURI string, probability float64) (
 		),
 	)
 
-	// I can only get this working properly using the singleton :(
 	otel.SetTracerProvider(traceProvider)
+	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
 	return traceProvider, nil
 }

@@ -3,22 +3,7 @@ package v1
 
 import (
 	"errors"
-	"net/http"
-
-	"github.com/ggicci/httpin"
 )
-
-// PagingOptions contains the options for paginating a list of items.
-type PagingOptions struct {
-	Page     int `in:"query=page;default=1"`
-	PageSize int `in:"query=size;default=20"`
-}
-
-// GetPagingOptions returns the paging options from the request.
-func GetPagingOptions(r *http.Request) PagingOptions {
-	opts := r.Context().Value(httpin.Input).(*PagingOptions)
-	return *opts
-}
 
 // ErrorResponse is the form used for API responses from failures in the API.
 type ErrorResponse struct {

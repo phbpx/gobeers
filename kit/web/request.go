@@ -13,6 +13,14 @@ func Param(r *http.Request, key string) string {
 	return m[key]
 }
 
+// Query returns the query string value for the provided key.
+func Query(r *http.Request, key string, fallback string) string {
+	if v := r.URL.Query().Get(key); len(v) > 0 {
+		return v
+	}
+	return fallback
+}
+
 // Decode reads the body of an HTTP request looking for a JSON document. The
 // body is decoded into the provided value.
 //

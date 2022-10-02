@@ -7,6 +7,8 @@ import (
 	"github.com/phbpx/gobeers/internal/sys/validate"
 	v1Web "github.com/phbpx/gobeers/internal/web/v1"
 	"github.com/phbpx/gobeers/kit/web"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 )
 
@@ -58,6 +60,12 @@ func Errors(log *zap.SugaredLogger) web.Middleware {
 						Error: http.StatusText(http.StatusInternalServerError),
 					}
 					status = http.StatusInternalServerError
+				}
+
+				// If status is 500, record error in the trace.
+				if status == http.StatusInternalServerError {
+					spam := trace.SpanFromContext(ctx)
+					spam.SetAttributes(attribute.String("request.error", err.Error()))
 				}
 
 				// Respond with the error back to the client.
