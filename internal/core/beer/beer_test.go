@@ -50,31 +50,31 @@ func TestBeer(t *testing.T) {
 
 			beer, err := core.Create(ctx, nb, now)
 			if err != nil {
-				t.Fatalf("\t\t [ERROR] Should be able to add a beer : %s", err)
+				t.Fatalf("\t [ERROR] Should be able to add a beer : %s", err)
 			}
-			t.Logf("\t\t [SUCCESS] Should be able to add a beer.")
+			t.Logf("\t [SUCCESS] Should be able to add a beer.")
 
 			saved, err := core.QueryByID(ctx, beer.ID)
 			if err != nil {
-				t.Fatalf("\t\t [ERROR] Should be able to query a beer by id : %s", err)
+				t.Fatalf("\t [ERROR] Should be able to query a beer by id : %s", err)
 			}
-			t.Logf("\t\t [SUCCESS] Should be able to query a beer by id.")
+			t.Logf("\t [SUCCESS] Should be able to query a beer by id.")
 
 			if diff := cmp.Diff(beer, saved); diff != "" {
-				t.Fatalf("\t\t [ERROR] Should get back the same beer : %s", diff)
+				t.Fatalf("\t [ERROR] Should get back the same beer : %s", diff)
 			}
-			t.Logf("\t\t [SUCCESS] Should get back the same beer.")
+			t.Logf("\t [SUCCESS] Should get back the same beer.")
 
 			beers, err := core.Query(ctx, 1, 10)
 			if err != nil {
-				t.Fatalf("\t\t [ERROR] Should be able to query beers : %s", err)
+				t.Fatalf("\t [ERROR] Should be able to query beers : %s", err)
 			}
-			t.Logf("\t\t [SUCCESS] Should be able to query beers.")
+			t.Logf("\t [SUCCESS] Should be able to query beers.")
 
 			if len(beers) == 0 {
-				t.Fatalf("\t\t [ERROR] Should get back at least one beer.")
+				t.Fatalf("\t [ERROR] Should get back at least one beer.")
 			}
-			t.Logf("\t\t [SUCCESS] Should get back at least one beer.")
+			t.Logf("\t [SUCCESS] Should get back at least one beer.")
 		}
 	}
 
@@ -95,7 +95,7 @@ func TestBeer(t *testing.T) {
 
 			b, err := core.Create(ctx, nb, now)
 			if err != nil {
-				t.Fatalf("\t\t [ERROR] Should be able to add a beer : %s", err)
+				t.Fatalf("\t [ERROR] Should be able to add a beer : %s", err)
 			}
 
 			nr := beer.NewReview{
@@ -106,20 +106,20 @@ func TestBeer(t *testing.T) {
 
 			_, err = core.CreateReview(ctx, b.ID, nr, now)
 			if err != nil {
-				t.Fatalf("\t\t [ERROR] Should be able to add a review : %s", err)
+				t.Fatalf("\t [ERROR] Should be able to add a review : %s", err)
 			}
-			t.Logf("\t\t [SUCCESS] Should be able to add a review.")
+			t.Logf("\t [SUCCESS] Should be able to add a review.")
 
 			reviews, err := core.QueryReviews(ctx, b.ID, 1, 10)
 			if err != nil {
-				t.Fatalf("\t\t [ERROR] Should be able to query reviews : %s", err)
+				t.Fatalf("\t [ERROR] Should be able to query reviews : %s", err)
 			}
-			t.Logf("\t\t [SUCCESS] Should be able to query reviews.")
+			t.Logf("\t [SUCCESS] Should be able to query reviews.")
 
 			if len(reviews) == 0 {
-				t.Fatalf("\t\t [ERROR] Should get back at least one review.")
+				t.Fatalf("\t [ERROR] Should get back at least one review.")
 			}
-			t.Logf("\t\t [SUCCESS] Should get back at least one review.")
+			t.Logf("\t [SUCCESS] Should get back at least one review.")
 		}
 	}
 }

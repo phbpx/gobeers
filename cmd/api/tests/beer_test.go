@@ -53,19 +53,19 @@ func (bt *BeerTests) postBeers400(t *testing.T) {
 
 	t.Log("Given the need to validate a new beer can't be created with an invalid payload.")
 	{
-		t.Log("\t\t When using an incomplete beer value.")
+		t.Log("\t When using an incomplete beer value.")
 		{
 			if w.Code != http.StatusBadRequest {
-				t.Fatalf("\t\t [ERROR] Should receive a status code of 400 for the response : %v", w.Code)
+				t.Fatalf("\t [ERROR] Should receive a status code of 400 for the response : %v", w.Code)
 			}
-			t.Log("\t\t [OK] Should receive a status code of 400 for the response.")
+			t.Log("\t [SUCCESS] Should receive a status code of 400 for the response.")
 
 			// Inspect the response.
 			var got v1Web.ErrorResponse
 			if err := json.NewDecoder(w.Body).Decode(&got); err != nil {
-				t.Fatalf("\t\t [ERROR] Should be able to unmarshal the response to an error type : %v", err)
+				t.Fatalf("\t [ERROR] Should be able to unmarshal the response to an error type : %v", err)
 			}
-			t.Log("\t\t Should be able to unmarshal the response to an error type.")
+			t.Log("\t [SUCCESS] Should be able to unmarshal the response to an error type.")
 
 			fields := validate.FieldErrors{
 				{Field: "name", Error: "name is a required field"},
@@ -86,9 +86,9 @@ func (bt *BeerTests) postBeers400(t *testing.T) {
 			})
 
 			if diff := cmp.Diff(got, exp, sorter); diff != "" {
-				t.Fatalf("\t\t [ERROR] Should get the expected result. Diff:\n%s", diff)
+				t.Fatalf("\t [ERROR] Should get the expected result. Diff:\n%s", diff)
 			}
-			t.Log("\t\t [OK] Should get the expected result.")
+			t.Log("\t [SUCCESS] Should get the expected result.")
 		}
 	}
 }
@@ -104,19 +104,19 @@ func (bt *BeerTests) getBeers400(t *testing.T) {
 
 	t.Log("Given the need to validate getting a product with a malformed id.")
 	{
-		t.Logf("\t\t When using the new beer %s.", id)
+		t.Logf("\t When using the new beer %s.", id)
 		{
 			if w.Code != http.StatusBadRequest {
-				t.Fatalf("\t\t [ERROR] Should receive a status code of 400 for the response : %v", w.Code)
+				t.Fatalf("\t [ERROR] Should receive a status code of 400 for the response : %v", w.Code)
 			}
-			t.Log("\t\t [OK] Should receive a status code of 400 for the response.")
+			t.Log("\t [SUCCESS] Should receive a status code of 400 for the response.")
 
 			got := w.Body.String()
 			exp := `{"error":"ID is not in its proper form"}`
 			if got != exp {
-				t.Fatalf("\t\t [ERROR] Should get the expected result.\n\t\t Got: %s.\n\t\t Exp: %s", got, exp)
+				t.Fatalf("\t [ERROR] Should get the expected result.\n\t\t Got: %s.\n\t\t Exp: %s", got, exp)
 			}
-			t.Log("\t\t [OK] Should get the expected result.")
+			t.Log("\t [SUCCESS] Should get the expected result.")
 		}
 	}
 }
@@ -131,12 +131,12 @@ func (bt *BeerTests) getBeers404(t *testing.T) {
 
 	t.Log("Given the need to validate deleting a product that does not exist.")
 	{
-		t.Log("Given the need to validate getting a beer with an unknown id.")
+		t.Log("\t Given the need to validate getting a beer with an unknown id.")
 		{
 			if w.Code != http.StatusNotFound {
-				t.Fatalf("\t\t [ERROR] Should receive a status code of 404 for the response : %v", w.Code)
+				t.Fatalf("\t [ERROR] Should receive a status code of 404 for the response : %v", w.Code)
 			}
-			t.Log("\t\t [OK] Should receive a status code of 404 for the response.")
+			t.Log("\t [SUCCESS] Should receive a status code of 404 for the response.")
 		}
 	}
 }
