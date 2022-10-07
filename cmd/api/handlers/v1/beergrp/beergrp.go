@@ -13,6 +13,11 @@ import (
 	"github.com/phbpx/gobeers/kit/web"
 )
 
+const (
+	defaultPage = "1"
+	defaultSize = "10"
+)
+
 // Handlers manages the set of beer endpoints.
 type Handlers struct {
 	Beer beer.Core
@@ -57,13 +62,13 @@ func (h Handlers) QueryByID(ctx context.Context, w http.ResponseWriter, r *http.
 }
 
 func (h Handlers) Query(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	page := web.Query(r, "page", "1")
+	page := web.Query(r, "page", defaultPage)
 	pageNumber, err := strconv.Atoi(page)
 	if err != nil {
 		return v1Web.NewRequestError(fmt.Errorf("invalid page format, page[%s]", page), http.StatusBadRequest)
 	}
 
-	size := web.Query(r, "size", "10")
+	size := web.Query(r, "size", defaultSize)
 	sizeNumber, err := strconv.Atoi(size)
 	if err != nil {
 		return v1Web.NewRequestError(fmt.Errorf("invalid rows format, size[%s]", size), http.StatusBadRequest)
@@ -114,13 +119,13 @@ func (h Handlers) CreateReview(ctx context.Context, w http.ResponseWriter, r *ht
 func (h Handlers) QueryReviews(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	id := web.Param(r, "id")
 
-	page := web.Query(r, "page", "1")
+	page := web.Query(r, "page", defaultPage)
 	pageNumber, err := strconv.Atoi(page)
 	if err != nil {
 		return v1Web.NewRequestError(fmt.Errorf("invalid page format, page[%s]", page), http.StatusBadRequest)
 	}
 
-	size := web.Query(r, "size", "10")
+	size := web.Query(r, "size", defaultSize)
 	sizeNumber, err := strconv.Atoi(size)
 	if err != nil {
 		return v1Web.NewRequestError(fmt.Errorf("invalid rows format, size[%s]", size), http.StatusBadRequest)

@@ -6,7 +6,6 @@ require (
 	github.com/ardanlabs/conf/v3 v3.1.2
 	github.com/ardanlabs/service v0.0.0-20220919155514-650f88cfc649
 	github.com/dimfeld/httptreemux/v5 v5.4.0
-	github.com/ggicci/httpin v0.10.1
 	github.com/go-playground/locales v0.14.0
 	github.com/go-playground/universal-translator v0.18.0
 	github.com/go-playground/validator/v10 v10.11.1

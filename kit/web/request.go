@@ -2,6 +2,7 @@ package web
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/dimfeld/httptreemux/v5"
@@ -14,11 +15,11 @@ func Param(r *http.Request, key string) string {
 }
 
 // Query returns the query string value for the provided key.
-func Query(r *http.Request, key string, fallback string) string {
+func Query(r *http.Request, key string, fallback interface{}) string {
 	if v := r.URL.Query().Get(key); len(v) > 0 {
 		return v
 	}
-	return fallback
+	return fmt.Sprint(fallback)
 }
 
 // Decode reads the body of an HTTP request looking for a JSON document. The
