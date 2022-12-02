@@ -1,10 +1,6 @@
 package beer
 
-import (
-	"time"
-
-	"github.com/phbpx/gobeers/internal/core/beer/db"
-)
+import "time"
 
 // NewBeer represents a new beer to be added to the system.
 type NewBeer struct {
@@ -42,46 +38,4 @@ type Review struct {
 	Score     float32   `json:"score"`
 	Comment   string    `json:"comment"`
 	CreatedAt time.Time `json:"created_at"`
-}
-
-// =============================================================================
-
-func toBeer(dbBeer db.Beer) Beer {
-	return Beer{
-		ID:        dbBeer.ID,
-		Name:      dbBeer.Name,
-		Brewery:   dbBeer.Brewery,
-		Style:     dbBeer.Style,
-		ABV:       dbBeer.ABV,
-		ShortDesc: dbBeer.ShortDesc,
-		Score:     dbBeer.Score,
-		CreatedAt: dbBeer.CreatedAt,
-	}
-}
-
-func toBeerSlice(dbBeers []db.Beer) []Beer {
-	beers := make([]Beer, len(dbBeers))
-	for i := range dbBeers {
-		beers[i] = toBeer(dbBeers[i])
-	}
-	return beers
-}
-
-func toReview(dbReview db.Review) Review {
-	return Review{
-		ID:        dbReview.ID,
-		BeerID:    dbReview.BeerID,
-		UserID:    dbReview.UserID,
-		Score:     dbReview.Score,
-		Comment:   dbReview.Comment,
-		CreatedAt: dbReview.CreatedAt,
-	}
-}
-
-func toReviewSlice(dbReviews []db.Review) []Review {
-	reviews := make([]Review, len(dbReviews))
-	for i := range dbReviews {
-		reviews[i] = toReview(dbReviews[i])
-	}
-	return reviews
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/uuid"
 	"github.com/phbpx/gobeers/internal/core/beer"
+	"github.com/phbpx/gobeers/internal/core/beer/stores/beerdb"
 	"github.com/phbpx/gobeers/internal/data/dbtest"
 	"github.com/phbpx/gobeers/kit/docker"
 )
@@ -31,7 +32,7 @@ func TestBeer(t *testing.T) {
 	log, db, teardown := dbtest.NewUnit(t, c, "testbeer")
 	t.Cleanup(teardown)
 
-	core := beer.NewCore(log, db)
+	core := beer.NewCore(beerdb.NewStore(log, db))
 
 	t.Log("Given the need to work with Beer records.")
 	{

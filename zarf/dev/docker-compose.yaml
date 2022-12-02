@@ -35,6 +35,7 @@ services:
       GOBEERS_ZIPKIN_REPORTER_URI: "http://zipkin:9411/api/v2/spans"
     ports:
       - 3000:3000
+      - 4000:4000
     depends_on:
       - db
       - zipkin

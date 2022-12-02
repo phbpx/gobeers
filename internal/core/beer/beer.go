@@ -10,11 +10,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jmoiron/sqlx"
-	"github.com/phbpx/gobeers/internal/core/beer/db"
 	"github.com/phbpx/gobeers/internal/sys/database"
 	"github.com/phbpx/gobeers/internal/sys/validate"
-	"go.uber.org/zap"
 )
 
 // Set of error variables for CRUD operations.
@@ -23,15 +20,24 @@ var (
 	ErrInvalidID = errors.New("ID is not in its proper form")
 )
 
+// Store .
+type Store interface {
+    AddBeer(ctx context.Context, beer Beer) error
+    QueryBeers(ctx context.Context, page int, size int) ([]Beer, error)
+    QueryBeerByID(ctx context.Context, beerID string) (Beer, error)
+    AddReview(ctx context.Context, review Review) error
+    QueryBeerReviews(ctx context.Context, beerID string, page int, size int) ([]Review, error)
+}
+
 // Core manages the set of APIs for beer access.
 type Core struct {
-	store db.Store
+	store Store
 }
 
 // NewCore constructs a core for product api access.
-func NewCore(log *zap.SugaredLogger, sqlxDB *sqlx.DB) Core {
+func NewCore(store Store) Core {
 	return Core{
-		store: db.NewStore(log, sqlxDB),
+		store: store,
 	}
 }
 
@@ -45,7 +51,7 @@ func (c Core) Create(ctx context.Context, nb NewBeer, now time.Time) (Beer, erro
 		return Beer{}, fmt.Errorf("validating data: %w", err)
 	}
 
-	dbBeer := db.Beer{
+	beer := Beer{
 		ID:        uuid.New().String(),
 		Name:      nb.Name,
 		Brewery:   nb.Brewery,
@@ -55,11 +61,11 @@ func (c Core) Create(ctx context.Context, nb NewBeer, now time.Time) (Beer, erro
 		CreatedAt: now,
 	}
 
-	if err := c.store.AddBeer(ctx, dbBeer); err != nil {
+	if err := c.store.AddBeer(ctx, beer); err != nil {
 		return Beer{}, fmt.Errorf("addBeer: %w", err)
 	}
 
-	return toBeer(dbBeer), nil
+	return beer, nil
 }
 
 // QueryByID gets the specified beer from the database.
@@ -68,7 +74,7 @@ func (c Core) QueryByID(ctx context.Context, id string) (Beer, error) {
 		return Beer{}, ErrInvalidID
 	}
 
-	dbBeer, err := c.store.QueryBeerByID(ctx, id)
+	beer, err := c.store.QueryBeerByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, database.ErrDBNotFound) {
 			return Beer{}, ErrNotFound
@@ -76,17 +82,17 @@ func (c Core) QueryByID(ctx context.Context, id string) (Beer, error) {
 		return Beer{}, fmt.Errorf("queryBeerByID: %w", err)
 	}
 
-	return toBeer(dbBeer), nil
+	return beer, nil
 }
 
 // Query gets all beers from the database.
 func (c Core) Query(ctx context.Context, page, pageSize int) ([]Beer, error) {
-	dbBeers, err := c.store.QueryBeers(ctx, page, pageSize)
+	beers, err := c.store.QueryBeers(ctx, page, pageSize)
 	if err != nil {
 		return nil, fmt.Errorf("queryBeers: %w", err)
 	}
 
-	return toBeerSlice(dbBeers), nil
+	return beers, nil
 }
 
 // =========================================================================
@@ -103,7 +109,7 @@ func (c Core) CreateReview(ctx context.Context, beerID string, nr NewReview, now
 		return Review{}, fmt.Errorf("validating data: %w", err)
 	}
 
-	_, err := c.store.QueryBeerByID(ctx, beerID)
+	beer, err := c.store.QueryBeerByID(ctx, beerID)
 	if err != nil {
 		if errors.Is(err, database.ErrDBNotFound) {
 			return Review{}, ErrNotFound
@@ -111,32 +117,32 @@ func (c Core) CreateReview(ctx context.Context, beerID string, nr NewReview, now
 		return Review{}, fmt.Errorf("reviewing beer berrID[%s]: %w", beerID, err)
 	}
 
-	dbReview := db.Review{
+	review := Review{
 		ID:        uuid.New().String(),
 		UserID:    nr.UserID,
-		BeerID:    beerID,
+		BeerID:    beer.ID,
 		Score:     nr.Score,
 		Comment:   nr.Comment,
 		CreatedAt: now,
 	}
 
-	if err := c.store.AddReview(ctx, dbReview); err != nil {
+	if err := c.store.AddReview(ctx, review); err != nil {
 		return Review{}, fmt.Errorf("addReview: %w", err)
 	}
 
-	return toReview(dbReview), nil
+	return review, nil
 }
 
 // QueryReviews gets all reviews for a beer from the database.
-func (c Core) QueryReviews(ctx context.Context, beerID string, page, pageSize int) ([]Review, error) {
+func (c Core) QueryReviews(ctx context.Context, beerID string, page int, size int) ([]Review, error) {
 	if err := validate.CheckID(beerID); err != nil {
 		return nil, ErrInvalidID
 	}
 
-	dbReviews, err := c.store.QueryBeerReviews(ctx, beerID, page, pageSize)
+	reviews, err := c.store.QueryBeerReviews(ctx, beerID, page, size)
 	if err != nil {
 		return nil, fmt.Errorf("queryBeerReviews: %w", err)
 	}
 
-	return toReviewSlice(dbReviews), nil
+	return reviews, nil
 }

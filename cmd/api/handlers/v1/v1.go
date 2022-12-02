@@ -8,6 +8,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/phbpx/gobeers/cmd/api/handlers/v1/beergrp"
 	"github.com/phbpx/gobeers/internal/core/beer"
+	"github.com/phbpx/gobeers/internal/core/beer/stores/beerdb"
 	"github.com/phbpx/gobeers/kit/web"
 	"go.uber.org/zap"
 )
@@ -24,7 +25,7 @@ func Routes(app *web.App, cfg Config) {
 
 	// Register beer endpoints.
 	bgh := beergrp.Handlers{
-		Beer: beer.NewCore(cfg.Log, cfg.DB),
+		Beer: beer.NewCore(beerdb.NewStore(cfg.Log, cfg.DB)),
 	}
 	app.Handle(http.MethodGet, version, "/beers", bgh.Query)
 	app.Handle(http.MethodGet, version, "/beers/:id", bgh.QueryByID)
