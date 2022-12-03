@@ -9,10 +9,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/phbpx/gobeers/internal/data/dbschema"
 	"github.com/phbpx/gobeers/internal/sys/database"
 	"github.com/phbpx/gobeers/kit/docker"
+	"github.com/uptrace/bun"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -34,11 +34,11 @@ func StopDB(c *docker.Container) {
 // NewUnit creates a test database inside a Docker container. It creates the
 // required table structure but the database is otherwise empty. It returns
 // the database to use as well as a function to call at the end of the test.
-func NewUnit(t *testing.T, c *docker.Container, dbName string) (*zap.SugaredLogger, *sqlx.DB, func()) {
+func NewUnit(t *testing.T, c *docker.Container, dbName string) (*zap.SugaredLogger, *bun.DB, func()) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	dbM, err := database.Open(database.Config{
+	dbM, err := database.Opens(database.Config{
 		User:       "postgres",
 		Password:   "postgres",
 		Host:       c.Host,
@@ -51,7 +51,7 @@ func NewUnit(t *testing.T, c *docker.Container, dbName string) (*zap.SugaredLogg
 
 	t.Log("Waiting for database to be ready ...")
 
-	if err := database.StatusCheck(ctx, dbM); err != nil {
+	if err := database.StatusChecks(ctx, dbM); err != nil {
 		t.Fatalf("status check database: %v", err)
 	}
 
@@ -64,7 +64,7 @@ func NewUnit(t *testing.T, c *docker.Container, dbName string) (*zap.SugaredLogg
 
 	// =========================================================================
 
-	db, err := database.Open(database.Config{
+	db, err := database.Opens(database.Config{
 		User:       "postgres",
 		Password:   "postgres",
 		Host:       c.Host,
@@ -110,7 +110,7 @@ func NewUnit(t *testing.T, c *docker.Container, dbName string) (*zap.SugaredLogg
 
 // Test owns state for running and shutting down tests.
 type Test struct {
-	DB       *sqlx.DB
+	DB       *bun.DB
 	Log      *zap.SugaredLogger
 	Teardown func()
 

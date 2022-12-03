@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/phbpx/gobeers/internal/sys/database"
+	"github.com/uptrace/bun"
 	"go.uber.org/zap"
 )
 
@@ -17,7 +17,7 @@ import (
 type Handlers struct {
 	Build string
 	Log   *zap.SugaredLogger
-	DB    *sqlx.DB
+	DB    *bun.DB
 }
 
 // Readiness checks if the database is ready and if not will return a 500 status.
@@ -29,7 +29,7 @@ func (h Handlers) Readiness(w http.ResponseWriter, r *http.Request) {
 
 	status := "ok"
 	statusCode := http.StatusOK
-	if err := database.StatusCheck(ctx, h.DB); err != nil {
+	if err := database.StatusChecks(ctx, h.DB); err != nil {
 		status = "db not ready"
 		statusCode = http.StatusInternalServerError
 	}

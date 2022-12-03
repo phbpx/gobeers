@@ -22,11 +22,11 @@ var (
 
 // Store .
 type Store interface {
-    AddBeer(ctx context.Context, beer Beer) error
-    QueryBeers(ctx context.Context, page int, size int) ([]Beer, error)
-    QueryBeerByID(ctx context.Context, beerID string) (Beer, error)
-    AddReview(ctx context.Context, review Review) error
-    QueryBeerReviews(ctx context.Context, beerID string, page int, size int) ([]Review, error)
+	AddBeer(ctx context.Context, beer Beer) error
+	QueryBeers(ctx context.Context, page int, size int) ([]Beer, error)
+	QueryBeerByID(ctx context.Context, beerID string) (Beer, error)
+	AddReview(ctx context.Context, review Review) error
+	QueryBeerReviews(ctx context.Context, beerID string, page int, size int) ([]Review, error)
 }
 
 // Core manages the set of APIs for beer access.
@@ -76,7 +76,7 @@ func (c Core) QueryByID(ctx context.Context, id string) (Beer, error) {
 
 	beer, err := c.store.QueryBeerByID(ctx, id)
 	if err != nil {
-		if errors.Is(err, database.ErrDBNotFound) {
+		if database.IsNoRowError(err) {
 			return Beer{}, ErrNotFound
 		}
 		return Beer{}, fmt.Errorf("queryBeerByID: %w", err)
@@ -111,7 +111,7 @@ func (c Core) CreateReview(ctx context.Context, beerID string, nr NewReview, now
 
 	beer, err := c.store.QueryBeerByID(ctx, beerID)
 	if err != nil {
-		if errors.Is(err, database.ErrDBNotFound) {
+		if database.IsNoRowError(err) {
 			return Review{}, ErrNotFound
 		}
 		return Review{}, fmt.Errorf("reviewing beer berrID[%s]: %w", beerID, err)

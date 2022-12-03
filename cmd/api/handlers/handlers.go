@@ -7,11 +7,11 @@ import (
 	"net/http/pprof"
 	"os"
 
-	"github.com/ardanlabs/service/app/services/sales-api/handlers/debug/checkgrp"
-	"github.com/jmoiron/sqlx"
+	"github.com/phbpx/gobeers/cmd/api/handlers/debug/checkgrp"
 	v1 "github.com/phbpx/gobeers/cmd/api/handlers/v1"
 	"github.com/phbpx/gobeers/internal/web/v1/mid"
 	"github.com/phbpx/gobeers/kit/web"
+	"github.com/uptrace/bun"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 )
@@ -20,7 +20,7 @@ import (
 type APIMuxConfig struct {
 	Shutdown chan os.Signal
 	Log      *zap.SugaredLogger
-	DB       *sqlx.DB
+	DB       *bun.DB
 	Tracer   trace.Tracer
 }
 
@@ -66,7 +66,7 @@ func DebugStandardLibraryMux() *http.ServeMux {
 // debug application routes for the service. This bypassing the use of the
 // DefaultServerMux. Using the DefaultServerMux would be a security risk since
 // a dependency could inject a handler into our service without us knowing it.
-func DebugMux(build string, log *zap.SugaredLogger, db *sqlx.DB) http.Handler {
+func DebugMux(build string, log *zap.SugaredLogger, db *bun.DB) http.Handler {
 	mux := DebugStandardLibraryMux()
 
 	// Register debug check endpoints.

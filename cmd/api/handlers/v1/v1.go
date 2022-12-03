@@ -5,18 +5,18 @@ package v1
 import (
 	"net/http"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/phbpx/gobeers/cmd/api/handlers/v1/beergrp"
 	"github.com/phbpx/gobeers/internal/core/beer"
 	"github.com/phbpx/gobeers/internal/core/beer/stores/beerdb"
 	"github.com/phbpx/gobeers/kit/web"
+	"github.com/uptrace/bun"
 	"go.uber.org/zap"
 )
 
 // Config contains all the mandatory systems required by handlers.
 type Config struct {
 	Log *zap.SugaredLogger
-	DB  *sqlx.DB
+	DB  *bun.DB
 }
 
 // Routes binds all the version 1 routes.

@@ -132,7 +132,7 @@ func run(log *zap.SugaredLogger) error {
 	// Create connectivity to the database.
 	log.Infow("startup", "status", "initializing database support", "host", cfg.DB.Host)
 
-	db, err := database.Open(database.Config{
+	db, err := database.Opens(database.Config{
 		User:         cfg.DB.User,
 		Password:     cfg.DB.Password,
 		Host:         cfg.DB.Host,

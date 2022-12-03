@@ -10,8 +10,8 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/httpfs"
-	"github.com/jmoiron/sqlx"
 	"github.com/phbpx/gobeers/internal/sys/database"
+	"github.com/uptrace/bun"
 )
 
 //go:embed sql
@@ -19,8 +19,8 @@ var migrations embed.FS
 
 // Migrate attempts to bring the schema for db up to date with the migrations
 // defined in this package.
-func Migrate(ctx context.Context, db *sqlx.DB) error {
-	if err := database.StatusCheck(ctx, db); err != nil {
+func Migrate(ctx context.Context, db *bun.DB) error {
+	if err := database.StatusChecks(ctx, db); err != nil {
 		return fmt.Errorf("status check database: %w", err)
 	}
 
