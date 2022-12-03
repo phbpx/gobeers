@@ -8,7 +8,7 @@ COPY . /service
 
 # Build the service binary. We are doing this last since this will be different
 # every time we run through this process.
-WORKDIR /service/cmd/api
+WORKDIR /service/app/gobeers-api
 RUN ls -al && go build -ldflags "-X main.build=${BUILD_REF}"
 
 # Run the Go Binary in Alpine.
@@ -17,7 +17,7 @@ ARG BUILD_DATE
 ARG BUILD_REF
 RUN addgroup -g 1000 -S gobeers && \
     adduser -u 1000 -h /service -G gobeers -S gobeers
-COPY --from=build --chown=gobeers:gobeers /service/cmd/api/api /service/api
+COPY --from=build --chown=gobeers:gobeers /service/app/gobeers-api/gobeers-api /service/gobeers-api
 WORKDIR /service
 USER gobeers
-CMD ["./api"]
+CMD ["./gobeers-api"]

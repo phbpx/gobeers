@@ -1,6 +1,7 @@
 
 SHELL := /bin/bash
 ARGS = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
+VERSION := 1.0
 
 # ==============================================================================
 # help
@@ -100,9 +101,6 @@ docker-down:
 
 docker-clean:
 	docker system prune -f	
-
-docker-kind-logs:
-	docker logs -f $(KIND_CLUSTER)-control-plane
 
 # ==============================================================================
 # Dev support
