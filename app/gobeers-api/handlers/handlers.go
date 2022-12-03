@@ -7,8 +7,8 @@ import (
 	"net/http/pprof"
 	"os"
 
-	"github.com/phbpx/gobeers/app/gobeers-api/handlers/debug/checkgrp"
 	v1 "github.com/phbpx/gobeers/app/gobeers-api/handlers/v1"
+	"github.com/phbpx/gobeers/business/web/debug/checkgrp"
 	"github.com/phbpx/gobeers/business/web/v1/mid"
 	"github.com/phbpx/gobeers/foundation/web"
 	"github.com/uptrace/bun"
