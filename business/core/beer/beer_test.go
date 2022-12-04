@@ -23,7 +23,7 @@ func TestMain(m *testing.M) {
 		fmt.Println(err)
 		return
 	}
-	defer dbtest.StartDB()
+	defer dbtest.StopDB(c)
 
 	m.Run()
 }

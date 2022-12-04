@@ -17,13 +17,7 @@ import (
 	"github.com/phbpx/gobeers/business/data/dbschema"
 	"github.com/phbpx/gobeers/business/sys/database"
 	"github.com/phbpx/gobeers/foundation/logger"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/zipkin"
-	"go.opentelemetry.io/otel/propagation"
-	"go.opentelemetry.io/otel/sdk/resource"
-	"go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
+	"github.com/phbpx/gobeers/foundation/trace"
 	"go.uber.org/automaxprocs/maxprocs"
 	"go.uber.org/zap"
 )
@@ -82,18 +76,21 @@ func run(log *zap.SugaredLogger) error {
 			DebugHost       string        `conf:"default:0.0.0.0:4000"`
 		}
 		DB struct {
-			User         string `conf:"default:postgres"`
-			Password     string `conf:"default:postgres,mask"`
-			Host         string `conf:"default:localhost"`
-			Name         string `conf:"default:postgres"`
-			MaxIdleConns int    `conf:"default:0"`
-			MaxOpenConns int    `conf:"default:0"`
-			DisableTLS   bool   `conf:"default:true"`
+			User       string `conf:"default:postgres"`
+			Password   string `conf:"default:postgres,mask"`
+			Host       string `conf:"default:localhost"`
+			Name       string `conf:"default:postgres"`
+			DisableTLS bool   `conf:"default:true"`
 		}
-		Zipkin struct {
-			ReporterURI string  `conf:"default:http://localhost:9411/api/v2/spans"`
-			ServiceName string  `conf:"default:gobeers-api"`
-			Probability float64 `conf:"default:1.0"`
+		Trace struct {
+			ServiceName        string        `conf:"default:gobeers-api"`
+			ReporterURI        string        `conf:"default:http://zipkin:9411/api/v2/spans"`
+			Exporter           string        `conf:"default:zipkin"`
+			Probability        float64       `conf:"default:0.25"`
+			EnableTLS          bool          `conf:"default:false"`
+			ReconnectionPeriod time.Duration `conf:"default:1s"`
+			ConnectionTimeout  time.Duration `conf:"default:5s"`
+			APIKey             string        `conf:"default:YOUR_API_KEY"`
 		}
 	}{
 		Version: conf.Version{
@@ -133,13 +130,11 @@ func run(log *zap.SugaredLogger) error {
 	log.Infow("startup", "status", "initializing database support", "host", cfg.DB.Host)
 
 	db, err := database.Open(database.Config{
-		User:         cfg.DB.User,
-		Password:     cfg.DB.Password,
-		Host:         cfg.DB.Host,
-		Name:         cfg.DB.Name,
-		MaxIdleConns: cfg.DB.MaxIdleConns,
-		MaxOpenConns: cfg.DB.MaxOpenConns,
-		DisableTLS:   cfg.DB.DisableTLS,
+		User:       cfg.DB.User,
+		Password:   cfg.DB.Password,
+		Host:       cfg.DB.Host,
+		Name:       cfg.DB.Name,
+		DisableTLS: cfg.DB.DisableTLS,
 	})
 	if err != nil {
 		return fmt.Errorf("connecting to db: %w", err)
@@ -155,13 +150,18 @@ func run(log *zap.SugaredLogger) error {
 	// =========================================================================
 	// Start Tracing Support
 
-	log.Infow("startup", "status", "initializing OT/Zipkin tracing support")
+	log.Infow("startup", "status", "initializing tracing support")
 
-	traceProvider, err := startTracing(
-		cfg.Zipkin.ServiceName,
-		cfg.Zipkin.ReporterURI,
-		cfg.Zipkin.Probability,
-	)
+	traceProvider, err := trace.StartTracing(trace.Config{
+		Exporter:           cfg.Trace.Exporter,
+		ServiceName:        cfg.Trace.ServiceName,
+		ReporterURI:        cfg.Trace.ReporterURI,
+		APIKey:             cfg.Trace.APIKey,
+		ReconnectionPeriod: cfg.Trace.ReconnectionPeriod,
+		ConnectionTimeout:  cfg.Trace.ConnectionTimeout,
+		Probability:        cfg.Trace.Probability,
+		EnableTLS:          cfg.Trace.EnableTLS,
+	})
 	if err != nil {
 		return fmt.Errorf("starting tracing: %w", err)
 	}
@@ -250,43 +250,4 @@ func run(log *zap.SugaredLogger) error {
 	}
 
 	return nil
-}
-
-// =============================================================================
-
-// startTracing configure open telemetry to be used with zipkin.
-func startTracing(serviceName string, reporterURI string, probability float64) (*trace.TracerProvider, error) {
-
-	// WARNING: The current settings are using defaults which may not be
-	// compatible with your project. Please review the documentation for
-	// opentelemetry.
-
-	exporter, err := zipkin.New(
-		reporterURI,
-		// zipkin.WithLogger(zap.NewStdLog(log)),
-	)
-
-	if err != nil {
-		return nil, fmt.Errorf("creating new exporter: %w", err)
-	}
-
-	traceProvider := trace.NewTracerProvider(
-		trace.WithSampler(trace.TraceIDRatioBased(probability)),
-		trace.WithBatcher(exporter,
-			trace.WithMaxExportBatchSize(trace.DefaultMaxExportBatchSize),
-			trace.WithBatchTimeout(trace.DefaultScheduleDelay*time.Millisecond),
-			trace.WithMaxExportBatchSize(trace.DefaultMaxExportBatchSize),
-		),
-		trace.WithResource(
-			resource.NewWithAttributes(
-				semconv.SchemaURL,
-				semconv.ServiceNameKey.String(serviceName),
-				attribute.String("exporter", "zipkin"),
-			),
-		),
-	)
-
-	otel.SetTracerProvider(traceProvider)
-	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
-	return traceProvider, nil
 }

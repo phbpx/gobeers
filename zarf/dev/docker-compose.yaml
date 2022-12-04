@@ -31,7 +31,7 @@ services:
         BUILD_REF: dev
     environment:
       GOBEERS_DB_HOST: "db:5432"
-      GOBEERS_ZIPKIN_REPORTER_URI: "http://zipkin:9411/api/v2/spans"
+      GOBEERS_TRACE_REPORTER_URI: "http://zipkin:9411/api/v2/spans"
     ports:
       - 3000:3000
       - 4000:4000
