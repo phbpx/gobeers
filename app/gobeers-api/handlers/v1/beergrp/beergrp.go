@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	defaultPage = "1"
-	defaultSize = "10"
+	defaultPage = 1
+	defaultSize = 10
 )
 
 // Handlers manages the set of beer endpoints.
