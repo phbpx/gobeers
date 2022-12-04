@@ -10,7 +10,7 @@ import (
 
 // Respond converts a Go value to JSON and sends it to the client.
 func Respond(ctx context.Context, w http.ResponseWriter, data any, statusCode int) error {
-	ctx, span := AddSpan(ctx, "kit.web.response", attribute.Int("status", statusCode))
+	ctx, span := AddSpan(ctx, "foundation.web.response", attribute.Int("status", statusCode))
 	defer span.End()
 
 	// Set the status code for the request logger middleware.
