@@ -1,4 +1,4 @@
-// Package debug provides debug endpoints
+// Package debug provides handler support for the debugging endpoints.
 package debug
 
 import (
@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/http/pprof"
 
-	"github.com/phbpx/gobeers/business/web/debug/checkgrp"
+	"github.com/phbpx/gobeers/business/web/v1/debug/checkgrp"
 	"github.com/uptrace/bun"
 	"go.uber.org/zap"
 )

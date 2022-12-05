@@ -16,7 +16,7 @@ import (
 	"github.com/phbpx/gobeers/app/gobeers-api/handlers"
 	"github.com/phbpx/gobeers/business/data/dbschema"
 	"github.com/phbpx/gobeers/business/sys/database"
-	"github.com/phbpx/gobeers/business/web/debug"
+	"github.com/phbpx/gobeers/business/web/v1/debug"
 	"github.com/phbpx/gobeers/foundation/logger"
 	"github.com/phbpx/gobeers/foundation/trace"
 	"go.uber.org/automaxprocs/maxprocs"
