@@ -16,6 +16,7 @@ import (
 	"github.com/phbpx/gobeers/app/gobeers-api/handlers"
 	"github.com/phbpx/gobeers/business/data/dbschema"
 	"github.com/phbpx/gobeers/business/sys/database"
+	"github.com/phbpx/gobeers/business/web/debug"
 	"github.com/phbpx/gobeers/foundation/logger"
 	"github.com/phbpx/gobeers/foundation/trace"
 	"go.uber.org/automaxprocs/maxprocs"
@@ -178,7 +179,7 @@ func run(log *zap.SugaredLogger) error {
 	// related endpoints. This includes the standard library endpoints.
 
 	// Construct the mux for the debug calls.
-	debugMux := handlers.DebugMux(build, log, db)
+	debugMux := debug.Mux(build, log, db)
 
 	// Start the service listening for debug requests.
 	// Not concerned with shutting this down with load shedding.
