@@ -46,7 +46,7 @@ func NewCore(store Store) Core {
 
 // Create adds an beer to the database. Its return the created Beer
 // with fields populated.
-func (c Core) Create(ctx context.Context, nb NewBeer, now time.Time) (Beer, error) {
+func (c Core) Create(ctx context.Context, nb NewBeer) (Beer, error) {
 	if err := validate.Check(nb); err != nil {
 		return Beer{}, fmt.Errorf("validating data: %w", err)
 	}
@@ -58,7 +58,7 @@ func (c Core) Create(ctx context.Context, nb NewBeer, now time.Time) (Beer, erro
 		Style:     nb.Style,
 		ABV:       nb.ABV,
 		ShortDesc: nb.ShortDesc,
-		CreatedAt: now,
+		CreatedAt: time.Now(),
 	}
 
 	if err := c.store.AddBeer(ctx, beer); err != nil {

@@ -39,7 +39,6 @@ func TestBeer(t *testing.T) {
 		t.Logf("\tWhen handling a single Beer.")
 		{
 			ctx := context.Background()
-			now := time.Date(2022, 2, 25, 0, 0, 0, 0, time.UTC)
 
 			nb := beer.NewBeer{
 				Name:      "Test Beer",
@@ -49,7 +48,7 @@ func TestBeer(t *testing.T) {
 				ShortDesc: "Test Short Description",
 			}
 
-			beer, err := core.Create(ctx, nb, now)
+			beer, err := core.Create(ctx, nb)
 			if err != nil {
 				t.Fatalf("\t [ERROR] Should be able to add a beer : %s", err)
 			}
@@ -60,6 +59,9 @@ func TestBeer(t *testing.T) {
 				t.Fatalf("\t [ERROR] Should be able to query a beer by id : %s", err)
 			}
 			t.Logf("\t [SUCCESS] Should be able to query a beer by id.")
+
+			beer.CreatedAt = time.Time{}
+			saved.CreatedAt = time.Time{}
 
 			if diff := cmp.Diff(beer, saved); diff != "" {
 				t.Fatalf("\t [ERROR] Should get back the same beer : %s", diff)
@@ -94,7 +96,7 @@ func TestBeer(t *testing.T) {
 				ShortDesc: "Test Short Description",
 			}
 
-			b, err := core.Create(ctx, nb, now)
+			b, err := core.Create(ctx, nb)
 			if err != nil {
 				t.Fatalf("\t [ERROR] Should be able to add a beer : %s", err)
 			}

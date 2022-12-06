@@ -25,17 +25,12 @@ type Handlers struct {
 
 // Create adds a new beer to the system.
 func (h Handlers) Create(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	v, err := web.GetValues(ctx)
-	if err != nil {
-		return web.NewShutdownError("web value missing from context")
-	}
-
 	var nb beer.NewBeer
 	if err := web.Decode(r, &nb); err != nil {
 		return fmt.Errorf("unable to decode payload: %w", err)
 	}
 
-	b, err := h.Beer.Create(ctx, nb, v.Now)
+	b, err := h.Beer.Create(ctx, nb)
 	if err != nil {
 		return fmt.Errorf("creating new beer, nb[%+v]: %w", nb, err)
 	}
