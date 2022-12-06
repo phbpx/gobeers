@@ -9,15 +9,12 @@ import (
 )
 
 // This holds the single instance of the metrics value needed for
-// collecting metrics. The expvar package is already based on a singleton
-// for the different metrics that are registered with the package so there
-// isn't much choice here.
+// collecting metrics.
 var m *metrics
 
 // =============================================================================
 
-// metrics represents the set of metrics we gather. These fields are
-// safe to be accessed concurrently thanks to expvar. No extra abstraction is required.
+// metrics represents the set of metrics we gather.
 type metrics struct {
 	requests prometheus.Counter
 	errors   prometheus.Counter
@@ -25,21 +22,18 @@ type metrics struct {
 }
 
 // init constructs the metrics value that will be used to capture metrics.
-// The metrics value is stored in a package level variable since everything
-// inside of expvar is registered as a singleton. The use of once will make
-// sure this initialization only happens once.
 func init() {
 	m = &metrics{
 		requests: promauto.NewCounter(prometheus.CounterOpts{
-			Name: "requests",
+			Name: "app_requests",
 			Help: "Number of HTTP requests.",
 		}),
 		errors: promauto.NewCounter(prometheus.CounterOpts{
-			Name: "errors",
+			Name: "app_errors",
 			Help: "Number of errors.",
 		}),
 		panics: promauto.NewCounter(prometheus.CounterOpts{
-			Name: "panics",
+			Name: "app_panics",
 			Help: "Number of panics.",
 		}),
 	}
