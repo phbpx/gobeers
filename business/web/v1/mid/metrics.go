@@ -25,9 +25,8 @@ func Metrics() web.Middleware {
 
 			// Handle updating the metrics that can be handled here.
 
-			// Increment the request and goroutines counter.
+			// Increment the request counter.
 			metrics.AddRequests(ctx)
-			metrics.AddGoroutines(ctx)
 
 			// Increment if there is an error flowing through the request.
 			if err != nil {

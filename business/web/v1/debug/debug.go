@@ -2,11 +2,11 @@
 package debug
 
 import (
-	"expvar"
 	"net/http"
 	"net/http/pprof"
 
 	"github.com/phbpx/gobeers/business/web/v1/debug/checkgrp"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/uptrace/bun"
 	"go.uber.org/zap"
 )
@@ -24,7 +24,6 @@ func StandardLibraryMux() *http.ServeMux {
 	mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
 	mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
 	mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
-	mux.Handle("/debug/vars", expvar.Handler())
 
 	return mux
 }
@@ -44,6 +43,7 @@ func Mux(build string, log *zap.SugaredLogger, db *bun.DB) http.Handler {
 	}
 	mux.HandleFunc("/debug/readiness", cgh.Readiness)
 	mux.HandleFunc("/debug/liveness", cgh.Liveness)
+	mux.Handle("/debug/metrics", promhttp.Handler())
 
 	return mux
 }

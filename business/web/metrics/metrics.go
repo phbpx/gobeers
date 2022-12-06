@@ -3,8 +3,9 @@ package metrics
 
 import (
 	"context"
-	"expvar"
-	"runtime"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
 // This holds the single instance of the metrics value needed for
@@ -18,10 +19,9 @@ var m *metrics
 // metrics represents the set of metrics we gather. These fields are
 // safe to be accessed concurrently thanks to expvar. No extra abstraction is required.
 type metrics struct {
-	goroutines *expvar.Int
-	requests   *expvar.Int
-	errors     *expvar.Int
-	panics     *expvar.Int
+	requests prometheus.Counter
+	errors   prometheus.Counter
+	panics   prometheus.Counter
 }
 
 // init constructs the metrics value that will be used to capture metrics.
@@ -30,10 +30,18 @@ type metrics struct {
 // sure this initialization only happens once.
 func init() {
 	m = &metrics{
-		goroutines: expvar.NewInt("goroutines"),
-		requests:   expvar.NewInt("requests"),
-		errors:     expvar.NewInt("errors"),
-		panics:     expvar.NewInt("panics"),
+		requests: promauto.NewCounter(prometheus.CounterOpts{
+			Name: "requests",
+			Help: "Number of HTTP requests.",
+		}),
+		errors: promauto.NewCounter(prometheus.CounterOpts{
+			Name: "errors",
+			Help: "Number of errors.",
+		}),
+		panics: promauto.NewCounter(prometheus.CounterOpts{
+			Name: "panics",
+			Help: "Number of panics.",
+		}),
 	}
 }
 
@@ -58,32 +66,23 @@ func Set(ctx context.Context) context.Context {
 // different parts of the codebase. This will keep this package the
 // central authority for metrics and metrics won't get lost.
 
-// AddGoroutines refreshes the goroutine metric every 100 requests.
-func AddGoroutines(ctx context.Context) {
-	if v, ok := ctx.Value(key).(*metrics); ok {
-		if v.requests.Value()%100 == 0 {
-			v.goroutines.Set(int64(runtime.NumGoroutine()))
-		}
-	}
-}
-
 // AddRequests increments the request metric by 1.
 func AddRequests(ctx context.Context) {
 	if v, ok := ctx.Value(key).(*metrics); ok {
-		v.requests.Add(1)
+		v.requests.Inc()
 	}
 }
 
 // AddErrors increments the errors metric by 1.
 func AddErrors(ctx context.Context) {
 	if v, ok := ctx.Value(key).(*metrics); ok {
-		v.errors.Add(1)
+		v.errors.Inc()
 	}
 }
 
 // AddPanics increments the panics metric by 1.
 func AddPanics(ctx context.Context) {
 	if v, ok := ctx.Value(key).(*metrics); ok {
-		v.panics.Add(1)
+		v.panics.Inc()
 	}
 }
