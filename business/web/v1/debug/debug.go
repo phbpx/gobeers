@@ -43,6 +43,8 @@ func Mux(build string, log *zap.SugaredLogger, db *bun.DB) http.Handler {
 	}
 	mux.HandleFunc("/debug/readiness", cgh.Readiness)
 	mux.HandleFunc("/debug/liveness", cgh.Liveness)
+
+	// prometheus metrics.
 	mux.Handle("/debug/metrics", promhttp.Handler())
 
 	return mux

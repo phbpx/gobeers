@@ -58,29 +58,19 @@ func (h Handlers) Liveness(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		Status    string `json:"status,omitempty"`
-		Build     string `json:"build,omitempty"`
-		Host      string `json:"host,omitempty"`
-		Name      string `json:"name,omitempty"`
-		PodIP     string `json:"podIP,omitempty"`
-		Node      string `json:"node,omitempty"`
-		Namespace string `json:"namespace,omitempty"`
+		Status string `json:"status,omitempty"`
+		Build  string `json:"build,omitempty"`
+		Host   string `json:"host,omitempty"`
 	}{
-		Status:    "up",
-		Build:     h.Build,
-		Host:      host,
-		Name:      os.Getenv("KUBERNETES_NAME"),
-		PodIP:     os.Getenv("KUBERNETES_POD_IP"),
-		Node:      os.Getenv("KUBERNETES_NODE_NAME"),
-		Namespace: os.Getenv("KUBERNETES_NAMESPACE"),
+		Status: "up",
+		Build:  h.Build,
+		Host:   host,
 	}
 
 	statusCode := http.StatusOK
 	if err := response(w, statusCode, data); err != nil {
 		h.Log.Errorw("liveness", "ERROR", err)
 	}
-
-	// THIS IS A FREE TIMER. WE COULD UPDATE THE METRIC GOROUTINE COUNT HERE.
 
 	h.Log.Infow("liveness", "statusCode", statusCode, "method", r.Method, "path", r.URL.Path, "remoteaddr", r.RemoteAddr)
 }

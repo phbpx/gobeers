@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/phbpx/gobeers/business/web/metrics"
+	"github.com/phbpx/gobeers/business/sys/metrics"
 	"github.com/phbpx/gobeers/foundation/web"
 )
 
