@@ -20,8 +20,8 @@ var (
 	ErrInvalidID = errors.New("ID is not in its proper form")
 )
 
-// Store .
-type Store interface {
+// Storer .
+type Storer interface {
 	AddBeer(ctx context.Context, beer Beer) error
 	QueryBeers(ctx context.Context, page int, size int) ([]Beer, error)
 	QueryBeerByID(ctx context.Context, beerID string) (Beer, error)
@@ -31,11 +31,11 @@ type Store interface {
 
 // Core manages the set of APIs for beer access.
 type Core struct {
-	store Store
+	store Storer
 }
 
 // NewCore constructs a core for product api access.
-func NewCore(store Store) Core {
+func NewCore(store Storer) Core {
 	return Core{
 		store: store,
 	}

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/phbpx/gobeers/business/sys/validate"
+	"github.com/phbpx/gobeers/business/web/auth"
 	v1Web "github.com/phbpx/gobeers/business/web/v1"
 	"github.com/phbpx/gobeers/foundation/web"
 	"go.opentelemetry.io/otel/attribute"
@@ -54,6 +55,12 @@ func Errors(log *zap.SugaredLogger) web.Middleware {
 						Error: reqErr.Error(),
 					}
 					status = reqErr.Status
+
+				case auth.IsAuthError(err):
+					er = v1Web.ErrorResponse{
+						Error: http.StatusText(http.StatusUnauthorized),
+					}
+					status = http.StatusUnauthorized
 
 				default:
 					er = v1Web.ErrorResponse{
