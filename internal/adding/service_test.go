@@ -6,16 +6,23 @@ import (
 
 	"github.com/phbpx/gobeer/internal/adding"
 	"github.com/phbpx/gobeer/internal/beers"
+	"github.com/phbpx/gobeer/internal/coffees"
 )
 
 // mockRepository is a mock implementation of the Repository interface.
 type mockRepository struct {
 	data []beers.Beer
+	coffeeData []coffees.Coffee
 }
 
 // CreateBeer creates a new beer.
 func (m *mockRepository) CreateBeer(ctx context.Context, b beers.Beer) error {
 	m.data = append(m.data, b)
+	return nil
+}
+
+func (m *mockRepository) CreateCoffee(ctx context.Context, c coffees.Coffee) error {
+	m.coffeeData = append(m.coffeeData, c)
 	return nil
 }
 

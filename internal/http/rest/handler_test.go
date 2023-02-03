@@ -63,6 +63,14 @@ func TestHandler(t *testing.T) {
 	testGetBeerReviews200(t, h)
 	testGetBeerReviews204(t, h)
 	testGetBeerReviews400(t, h)
+
+	// coffee
+	testPostCoffee201(t, h)
+	testPostCoffee500WrongBitterness(t,h)
+	testPostCoffee500WrongState(t,h)
+	// testPostCoffee400(t, h)
+	// testPostCoffee409(t, h)
+	// testGetCoffees200(t, h)
 }
 
 func testPostBeer201(t *testing.T, h *rest.Handler) {
@@ -323,4 +331,97 @@ func getBeers(t *testing.T, h *rest.Handler) []beers.Beer {
 	}
 
 	return beers
+}
+
+func testPostCoffee201(t *testing.T, h *rest.Handler) {
+	nc := adding.NewCoffee{
+		Name:		"Test Coffee",
+		State:   	"SP",
+		ShortDesc: 	"Test Short Description",
+		Bitterness:	"low",
+		Acidity:    5.5,
+	}
+
+	coffee, err := json.Marshal(nc)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	r := httptest.NewRequest("POST", "/coffees", bytes.NewReader(coffee))
+	w := httptest.NewRecorder()
+
+	h.Router().ServeHTTP(w, r)
+
+	t.Log("Given the neeed to validate a new coffee can be added.")
+	{
+		t.Log("\tWhen checking the response code.")
+		{
+			if w.Code != http.StatusCreated {
+				t.Fatalf("\t\t[ERROR] Should receive a 201 status code. Got %d", w.Code)
+			}
+			t.Log("\t\t[OK] Should receive a 201 status code.")
+		}
+	}
+}
+
+func testPostCoffee500WrongBitterness(t *testing.T, h *rest.Handler) {
+	nc := adding.NewCoffee{
+		Name:		"Test Coffee",
+		State:   	"SP",
+		ShortDesc: 	"Test Short Description",
+		Bitterness:	"wrong",
+		Acidity:    5.5,
+	}
+
+	coffee, err := json.Marshal(nc)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	r := httptest.NewRequest("POST", "/coffees", bytes.NewReader(coffee))
+	w := httptest.NewRecorder()
+
+	h.Router().ServeHTTP(w, r)
+
+	t.Log("Given the neeed to validate a new coffee can not be added with invalid Bitterness.")
+	{
+		t.Log("\tWhen checking the response code.")
+		{
+			if w.Code != http.StatusInternalServerError {
+				t.Fatalf("\t\t[ERROR] Should receive a 500 status code. Got %d", w.Code)
+			}
+			t.Log("\t\t[OK] Should receive a 500 status code.")
+		}
+	}
+}
+
+func testPostCoffee500WrongState(t *testing.T, h *rest.Handler) {
+	nc := adding.NewCoffee{
+		Name:		"Test Coffee",
+		State:   	"WG",
+		ShortDesc: 	"Test Short Description",
+		Bitterness:	"low",
+		Acidity:    5.5,
+	}
+
+	coffee, err := json.Marshal(nc)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	r := httptest.NewRequest("POST", "/coffees", bytes.NewReader(coffee))
+	w := httptest.NewRecorder()
+
+	h.Router().ServeHTTP(w, r)
+
+	t.Log("Given the neeed to validate a new coffee can not be added with invalid State.")
+	{
+		t.Log("\tWhen checking the response code.")
+		{
+			if w.Code != http.StatusInternalServerError {
+				t.Fatalf("\t\t[ERROR] Should receive a 500 status code. Got %d", w.Code)
+			}
+			t.Log("\t\t[OK] Should receive a 500 status code.")
+		}
+	}
 }

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/phbpx/gobeer/internal/beers"
+	"github.com/phbpx/gobeer/internal/coffees"
 	"github.com/phbpx/gobeer/internal/reviews"
 )
 
@@ -219,4 +220,30 @@ func (s *Storage) ListReviews(ctx context.Context, id string) ([]reviews.Review,
 	}
 
 	return list, nil
+}
+
+func (s *Storage) CreateCoffee(ctx context.Context, c coffees.Coffee) error {
+	query := `
+        INSERT INTO coffees (
+                id,
+                name,
+                state,
+                bitterness,
+                acidity,
+                short_desc,
+                created_at
+        ) VALUES (
+                $1, $2, $3, $4, $5, $6, $7
+        )`
+
+	_, err := s.db.ExecContext(ctx, query,
+		c.ID,
+		c.Name,
+		c.State,
+		c.Bitterness,
+		c.Acidity,
+		c.ShortDesc,
+		c.CreatedAt)
+
+	return err
 }

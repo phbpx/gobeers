@@ -50,6 +50,7 @@ func (h *Handler) Router() *gin.Engine {
 
 	// app routes.
 	r.POST("/beers", h.addBeer)
+	r.POST("/coffees", h.addCoffee)
 	r.GET("/beers", h.listBeers)
 	r.POST("/beers/:id/reviews", h.addReview)
 	r.GET("/beers/:id/reviews", h.listReviews)
@@ -77,6 +78,23 @@ func (h *Handler) addBeer(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, b)
+}
+
+// addCoffee is the HTTP handler for the POST /coffees endpoint.
+func (h *Handler) addCoffee(c *gin.Context) {
+	var nc adding.NewCoffee
+	if err := c.ShouldBindJSON(&nc); err != nil {
+		c.Error(err)
+		return
+	}
+
+	coffee, err := h.adding.AddCoffee(c, nc)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusCreated, coffee)
 }
 
 // listBeers is the HTTP handler for the GET /beers endpoint.

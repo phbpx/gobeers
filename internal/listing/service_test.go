@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/phbpx/gobeer/internal/beers"
+	"github.com/phbpx/gobeer/internal/coffees"
 	"github.com/phbpx/gobeer/internal/listing"
 	"github.com/phbpx/gobeer/internal/reviews"
 )
